@@ -81,8 +81,7 @@ class DefenseEvaluationController extends Controller
         $this->canEdit($request, $evaluation);
         $criterionIds = $evaluation->grid->criteria()->pluck('id')->sort()->values();
         $scoredIds = $evaluation->scores()->pluck('evaluation_criterion_id')->sort()->values();
-        if ($criterionIds->isEmpty() || !$criterionIds->equalTo($scoredIds)) {
-            return response()->json(['message' => 'Tous les critères de la grille doivent être notés avant validation.'], 422);
+        if ($criterionIds->isEmpty() || $criterionIds->all() !== $scoredIds->all()) {
         }
         $this->recalculate($evaluation);
         $evaluation->update(['status' => 'validated', 'validated_at' => now()]);
