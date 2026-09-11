@@ -3,7 +3,10 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Auth\AuthenticationException;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 use Throwable;
+use Illuminate\Http\Request;
 
 class Handler extends ExceptionHandler
 {
@@ -45,6 +48,26 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        // Gérer les exceptions d'autorisation Spatie Permission (403)
+        $this->renderable(function (UnauthorizedException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Accès refusé. Vous n\'avez pas les permissions requises.'
+                ], 403);
+            }
+        });
+
+        // Gérer les exceptions d'authentification (401)
+        $this->renderable(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Non authentifié. Jeton d\'accès invalide ou absent.'
+                ], 401);
+            }
         });
     }
 }

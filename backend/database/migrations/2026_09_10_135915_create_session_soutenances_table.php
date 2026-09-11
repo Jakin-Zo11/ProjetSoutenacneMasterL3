@@ -13,8 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('etudiant')->after('email');
+        Schema::create('session_soutenances', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->enum('status', ['planifiee', 'en_cours', 'terminee'])->default('planifiee');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        Schema::dropIfExists('session_soutenances');
     }
 };

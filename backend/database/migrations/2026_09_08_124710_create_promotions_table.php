@@ -13,8 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('etudiant')->after('email');
+        Schema::create('promotions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('formation_id')->constrained()->onDelete('cascade');
+            $table->string('year');
+            $table->string('name');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        Schema::dropIfExists('promotions');
     }
 };
