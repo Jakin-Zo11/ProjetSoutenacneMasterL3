@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+
+    protected $guard_name = 'api';
 
     /**
      * The attributes that are mass assignable.
@@ -21,7 +24,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'telephone',
+        'matricule',
+        'status',
     ];
 
     /**
@@ -41,6 +46,45 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
     ];
+
+    /**
+     * Check if the user is a scolarite admin.
+     *
+     * @return bool
+     */
+    public function isAdminScolarite()
+    {
+        return $this->hasRole('admin_scolarite');
+    }
+
+    /**
+     * Check if the user is a president of mention.
+     *
+     * @return bool
+     */
+    public function isPresidentMention()
+    {
+        return $this->hasRole('president_mention');
+    }
+
+    /**
+     * Check if the user is a student.
+     *
+     * @return bool
+     */
+    public function isEtudiant()
+    {
+        return $this->hasRole('etudiant');
+    }
+
+    /**
+     * Check if the user is a teacher.
+     *
+     * @return bool
+     */
+    public function isEnseignant()
+    {
+        return $this->hasRole('enseignant');
+    }
 }

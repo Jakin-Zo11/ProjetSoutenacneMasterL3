@@ -14,7 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('etudiant')->after('email');
+            $table->string('telephone')->nullable();
+            $table->string('matricule')->nullable()->unique();
+            $table->enum('status', ['actif', 'inactif'])->default('actif');
         });
     }
 
@@ -26,7 +28,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
+            $table->dropColumn(['telephone', 'matricule', 'status']);
         });
     }
 };

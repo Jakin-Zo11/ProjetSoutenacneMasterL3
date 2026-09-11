@@ -15,7 +15,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Envoyer les rappels de soutenance 24h avant (exécution quotidennement à 8h)
+        $schedule->command('soutenances:send-reminders --hours=24')
+            ->dailyAt('08:00')
+            ->description('Envoyer les rappels de soutenance 24h avant');
+
+        // Envoyer les rappels de soutenance 48h avant (exécution quotidennement à 8h)
+        $schedule->command('soutenances:send-reminders --hours=48')
+            ->dailyAt('08:00')
+            ->description('Envoyer les rappels de soutenance 48h avant');
     }
 
     /**

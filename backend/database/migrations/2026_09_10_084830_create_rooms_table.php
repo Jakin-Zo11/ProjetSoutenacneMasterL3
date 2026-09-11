@@ -13,8 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('etudiant')->after('email');
+        Schema::create('rooms', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->string('building')->nullable();
+            $table->integer('capacity');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
         });
     }
 
@@ -25,8 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        Schema::dropIfExists('rooms');
     }
 };
