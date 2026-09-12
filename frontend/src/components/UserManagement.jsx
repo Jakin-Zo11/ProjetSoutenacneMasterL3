@@ -1,26 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
-  LayoutDashboard,
-  FileText,
-  Calendar,
   Users,
-  Settings,
-  LogOut,
   Search,
-  Bell,
   User,
   Plus,
   X,
   Edit,
-  Shield,
   GraduationCap,
   UserCheck,
   Clock,
   AlertTriangle,
   CheckCircle,
-  XCircle,
-  Filter,
-  MoreVertical,
   Lock,
   Unlock,
   History
@@ -134,7 +124,7 @@ const UserManagement = () => {
     ]);
   }, []);
 
-  // Fonction pour obtenir le badge de rôle
+  // Fonction pour obtenir le badge de rôle (palette EMIT stricte)
   const getRoleBadge = (role) => {
     const roleConfig = {
       president_jury: {
@@ -148,18 +138,18 @@ const UserManagement = () => {
         label: 'Rapporteur'
       },
       enseignant: {
-        bg: 'bg-blue-100',
-        text: 'text-blue-700',
+        bg: 'bg-[#EAF4FF]',
+        text: 'text-[#050840]',
         label: 'Enseignant'
       },
       scolarite: {
-        bg: 'bg-purple-100',
-        text: 'text-purple-700',
+        bg: 'bg-[#FEF3C7]',
+        text: 'text-[#92400E]',
         label: 'Scolarité'
       },
       etudiant: {
-        bg: 'bg-green-100',
-        text: 'text-green-700',
+        bg: 'bg-[#E1F8F0]',
+        text: 'text-[#065F46]',
         label: 'Étudiant'
       }
     };
@@ -173,36 +163,24 @@ const UserManagement = () => {
     );
   };
 
-  // Fonction pour obtenir le badge de disponibilité
+  // Fonction pour obtenir le badge de disponibilité (palette EMIT stricte)
   const getAvailabilityBadge = (disponibilite) => {
     if (disponibilite === 'disponible') {
       return (
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#E1F8F0] text-[#065F46]">
           <CheckCircle size={12} className="mr-1" />
           Disponible
         </span>
       );
     } else {
       return (
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#FEF3C7] text-[#92400E]">
           <Clock size={12} className="mr-1" />
           Indisponible
         </span>
       );
     }
   };
-
-  // Éléments du menu de navigation
-  const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'depots', label: 'Dépôts', icon: FileText },
-    { id: 'soutenances', label: 'Soutenances', icon: Calendar },
-    { id: 'formations', label: 'Formations & Promotions', icon: GraduationCap },
-    { id: 'utilisateurs', label: 'Utilisateurs & Jurys', icon: Users },
-    { id: 'settings', label: 'Paramètres', icon: Settings }
-  ];
-
-  const activeMenu = 'utilisateurs';
 
   // Filtrer les utilisateurs
   const filteredUsers = users.filter(user => {
@@ -295,107 +273,50 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#EBF3FA] font-sans" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <div className="flex min-h-screen">
-        {/* Sidebar */}
-        <aside className="w-72 bg-white border-r border-slate-200 flex flex-col fixed h-full z-10">
-          {/* Logo Section */}
-          <div className="p-6 border-b border-slate-200">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/logo.emit.png" 
-                alt="Logo EMIT" 
-                className="w-12 h-12 rounded-2xl object-contain"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextElementSibling.style.display = 'flex';
-                }}
-              />
-              <div className="w-12 h-12 bg-gradient-to-br from-[#050840] to-[#95C5F2] rounded-2xl flex items-center justify-center shadow-lg hidden">
-                <span className="text-white font-bold text-lg">EM</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-[#050840]">EMIT</h1>
-                <p className="text-xs text-slate-500">Fianarantsoa</p>
-              </div>
-            </div>
+    <div className="w-full">
+      {/* Header */}
+      <header className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-extrabold text-[#050840] mb-2">Gestion des Utilisateurs & Jurys</h1>
+            <p className="text-sm text-slate-600">Comptes enseignants, présidents de jury, rapporteurs et étudiants</p>
           </div>
 
-          {/* Navigation Menu */}
-          <nav className="flex-1 p-4 space-y-2">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeMenu === item.id;
-              return (
-                <button
-                  key={item.id}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 ${
-                    isActive
-                      ? 'bg-[#95C5F2] text-[#050840] shadow-md'
-                      : 'text-slate-600 hover:bg-slate-100'
-                  }`}
-                >
-                  <Icon size={20} />
-                  <span className="font-medium">{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+          {/* Search Bar */}
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Rechercher par nom, rôle ou spécialité..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-full w-80 focus:outline-none focus:ring-2 focus:ring-[#95C5F2] focus:border-transparent transition-all"
+              />
+            </div>
 
-          {/* Logout Button */}
-          <div className="p-4 border-t border-slate-200">
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-600 hover:bg-red-50 transition-all duration-200">
-              <LogOut size={20} />
-              <span className="font-medium">Déconnexion</span>
+            <button
+              onClick={() => {
+                setEditMode(false);
+                setSelectedUser(null);
+                setFormData({
+                  nom: '',
+                  prenom: '',
+                  email: '',
+                  role: '',
+                  grade: '',
+                  specialite: ''
+                });
+                setModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-6 py-2.5 bg-[#95C5F2] text-[#050840] font-bold rounded-full hover:bg-[#7DB5EC] transition-all shadow-md"
+            >
+              <Plus size={18} />
+              <span>Ajouter</span>
             </button>
           </div>
-        </aside>
-
-        {/* Main Content Area */}
-        <main className="flex-1 ml-72 p-8 overflow-y-auto">
-          {/* Header */}
-          <header className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h1 className="text-3xl font-bold text-[#050840] mb-2">Gestion des Utilisateurs & Jurys</h1>
-                <p className="text-slate-500">Comptes enseignants, présidents de jury, rapporteurs et étudiants</p>
-              </div>
-
-              {/* Search Bar */}
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Rechercher par nom, rôle ou spécialité..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-11 pr-4 py-2.5 bg-white border border-slate-200 rounded-full w-80 focus:outline-none focus:ring-2 focus:ring-[#95C5F2] focus:border-transparent transition-all"
-                  />
-                </div>
-
-                <button
-                  onClick={() => {
-                    setEditMode(false);
-                    setSelectedUser(null);
-                    setFormData({
-                      nom: '',
-                      prenom: '',
-                      email: '',
-                      role: '',
-                      grade: '',
-                      specialite: ''
-                    });
-                    setModalOpen(true);
-                  }}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-[#95C5F2] text-[#050840] font-bold rounded-full hover:bg-[#7DB5EC] transition-all shadow-md"
-                >
-                  <Plus size={20} />
-                  <span>Nouvel Utilisateur</span>
-                </button>
-              </div>
-            </div>
-          </header>
+        </div>
+      </header>
 
           {/* KPI Cards */}
           <section className="mb-8">
@@ -444,107 +365,105 @@ const UserManagement = () => {
             </div>
           </section>
 
-          {/* Filter Tabs */}
-          <section className="mb-6">
-            <div className="flex items-center gap-2">
-              {[
-                { id: 'tous', label: 'Tous', icon: Users },
-                { id: 'enseignants_jurys', label: 'Enseignants / Jurys', icon: UserCheck },
-                { id: 'etudiants', label: 'Étudiants', icon: GraduationCap },
-                { id: 'indisponibilites', label: 'Indisponibilités', icon: Clock }
-              ].map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      isActive
-                        ? 'bg-[#95C5F2] text-[#050840]'
-                        : 'bg-white text-slate-600 hover:bg-slate-100'
-                    }`}
-                  >
-                    <Icon size={16} />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
+      {/* Filter Tabs */}
+      <section className="mb-6">
+        <div className="flex items-center gap-2">
+          {[
+            { id: 'tous', label: 'Tous', icon: Users },
+            { id: 'enseignants_jurys', label: 'Enseignants / Jurys', icon: UserCheck },
+            { id: 'etudiants', label: 'Étudiants', icon: GraduationCap },
+            { id: 'indisponibilites', label: 'Indisponibilités', icon: Clock }
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-[#95C5F2] text-[#050840]'
+                    : 'bg-white text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                <Icon size={16} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
-          {/* Users List */}
-          <section>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Utilisateur</th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Rôle</th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Département / Spécialité</th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Disponibilité</th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-[#95C5F2] to-[#050840] rounded-full flex items-center justify-center">
-                              <span className="text-white font-semibold text-sm">{user.initiales}</span>
-                            </div>
-                            <div>
-                              <p className="font-medium text-[#050840]">{user.prenom} {user.nom}</p>
-                              <p className="text-xs text-slate-500">{user.email}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          {getRoleBadge(user.role)}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div>
-                            <p className="text-sm text-[#050840]">{user.departement}</p>
-                            <p className="text-xs text-slate-500">{user.specialite}</p>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          {getAvailabilityBadge(user.disponibilite)}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => handleEdit(user)}
-                              className="p-2 text-slate-400 hover:text-[#050840] hover:bg-slate-100 rounded-lg transition-all"
-                              title="Modifier"
-                            >
-                              <Edit size={16} />
-                            </button>
-                            <button
-                              className="p-2 text-slate-400 hover:text-[#050840] hover:bg-slate-100 rounded-lg transition-all"
-                              title="Historique des jurys"
-                            >
-                              <History size={16} />
-                            </button>
-                            <button
-                              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                              title="Bloquer/Débloquer"
-                            >
-                              {user.disponibilite === 'disponible' ? <Lock size={16} /> : <Unlock size={16} />}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-        </main>
-      </div>
+      {/* Users List */}
+      <section>
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-50">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Utilisateur</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Rôle</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Département / Spécialité</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Disponibilité</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredUsers.map((user) => (
+                  <tr key={user.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#95C5F2] to-[#050840] rounded-full flex items-center justify-center">
+                          <span className="text-white font-semibold text-sm">{user.initiales}</span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-[#050840]">{user.prenom} {user.nom}</p>
+                          <p className="text-xs text-slate-500">{user.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {getRoleBadge(user.role)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="text-sm text-[#050840]">{user.departement}</p>
+                        <p className="text-xs text-slate-500">{user.specialite}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {getAvailabilityBadge(user.disponibilite)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleEdit(user)}
+                          className="p-2 text-slate-400 hover:text-[#050840] hover:bg-slate-100 rounded-lg transition-all"
+                          title="Modifier"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          className="p-2 text-slate-400 hover:text-[#050840] hover:bg-slate-100 rounded-lg transition-all"
+                          title="Historique des jurys"
+                        >
+                          <History size={16} />
+                        </button>
+                        <button
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          title="Bloquer/Débloquer"
+                        >
+                          {user.disponibilite === 'disponible' ? <Lock size={16} /> : <Unlock size={16} />}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
       {/* Modal de Création / Édition Utilisateur */}
       {modalOpen && (

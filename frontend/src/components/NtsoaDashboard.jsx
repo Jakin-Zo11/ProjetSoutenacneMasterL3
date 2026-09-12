@@ -242,7 +242,7 @@ const NtsoaDashboard = () => {
               {/* Conteneur de logo - Carré blanc w-12 h-12 rounded-2xl p-1.5 */}
               <div className="w-12 h-12 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-md flex-shrink-0">
                 <img 
-                  src="/logo.emit.png" 
+                  src="/Logo-emit.png" 
                   alt="Logo EMIT" 
                   className="w-full h-full object-contain"
                   onError={(e) => {

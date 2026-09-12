@@ -28,10 +28,14 @@ import {
   Filter
 } from 'lucide-react';
 
-const AdminDashboard = ({ currentPage, setCurrentPage, onLogout }) => {
-  // État pour la page active
-  const [activePage, setActivePage] = useState(currentPage || 'dashboard');
-  const [activeMenu, setActiveMenu] = useState(currentPage || 'dashboard');
+const AdminDashboard = ({ activeTab, setActiveTab, onLogout }) => {
+  // État pour la page active (synchronisé avec activeTab depuis App.tsx)
+  const [activePage, setActivePage] = useState(activeTab || 'dashboard');
+
+  // Synchroniser activePage avec activeTab
+  useEffect(() => {
+    setActivePage(activeTab);
+  }, [activeTab]);
 
   // État pour les statistiques
   const [stats, setStats] = useState({
@@ -54,42 +58,6 @@ const AdminDashboard = ({ currentPage, setCurrentPage, onLogout }) => {
   // État pour la modal de reprogrammation
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStep, setModalStep] = useState(1);
-
-  // Navigation groups
-  const navGroups = [
-    {
-      label: 'Principal',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }
-      ]
-    },
-    {
-      label: 'Gestion académique',
-      items: [
-        { id: 'etudiants', label: 'Étudiants', icon: GraduationCap },
-        { id: 'enseignants', label: 'Enseignants', icon: UserCheck },
-        { id: 'jurys', label: 'Jurys', icon: Users }
-      ]
-    },
-    {
-      label: 'Soutenances',
-      items: [
-        { id: 'soutenances', label: 'Soutenances', icon: CalendarIcon },
-        { id: 'salles', label: 'Salles', icon: MapPin },
-        { id: 'creneaux', label: 'Créneaux', icon: ClockIcon },
-        { id: 'calendrier', label: 'Calendrier', icon: Calendar },
-        { id: 'affectation', label: 'Affectation jury', icon: UserCheck }
-      ]
-    },
-    {
-      label: 'Résultats',
-      items: [
-        { id: 'evaluations', label: 'Évaluations', icon: FileCheck },
-        { id: 'resultats', label: 'Résultats', icon: Award },
-        { id: 'pv', label: 'PV / Rapports', icon: FileText }
-      ]
-    }
-  ];
 
   // Données de démonstration
   useEffect(() => {
@@ -275,183 +243,136 @@ const AdminDashboard = ({ currentPage, setCurrentPage, onLogout }) => {
   // Fonction pour obtenir le titre de page
   const getPageTitle = () => {
     const titles = {
-      dashboard: { title: 'Dashboard', subtitle: 'Vue d\'ensemble du système de gestion des soutenances' },
-      soutenances: { title: 'Gestion des Soutenances', subtitle: 'Planification et suivi des soutenances de mémoire' },
-      etudiants: { title: 'Gestion des Étudiants', subtitle: 'Administration des étudiants inscrits' },
-      enseignants: { title: 'Gestion des Enseignants', subtitle: 'Administration du corps enseignant' },
-      jurys: { title: 'Gestion des Jurys', subtitle: 'Administration des membres de jury' },
+      dashboard: { title: 'Tableau de bord', subtitle: 'Vue d\'ensemble du système de gestion des soutenances' },
+      soutenances: { title: 'Soutenances', subtitle: 'Planification et suivi des soutenances de mémoire' },
+      etudiants: { title: 'Étudiants', subtitle: 'Administration des étudiants inscrits' },
+      enseignants: { title: 'Enseignants', subtitle: 'Administration du corps enseignant' },
+      jurys: { title: 'Jurys', subtitle: 'Administration des membres de jury' },
       resultats: { title: 'Résultats', subtitle: 'Consultation et publication des résultats de soutenance' },
       evaluations: { title: 'Évaluations', subtitle: 'Suivi des évaluations en cours' },
       pv: { title: 'PV / Rapports', subtitle: 'Gestion des procès-verbaux et rapports' },
-      salles: { title: 'Gestion des Salles', subtitle: 'Administration des espaces de soutenance' },
-      creneaux: { title: 'Gestion des Créneaux', subtitle: 'Planification des créneaux horaires' },
+      salles: { title: 'Salles', subtitle: 'Administration des espaces de soutenance' },
+      creneaux: { title: 'Créneaux', subtitle: 'Planification des créneaux horaires' },
       calendrier: { title: 'Calendrier', subtitle: 'Vue calendrier des soutenances' },
-      affectation: { title: 'Affectation Jury', subtitle: 'Affectation des jurys aux soutenances' }
+      affectation: { title: 'Affectation jury', subtitle: 'Affectation des jurys aux soutenances' }
     };
     return titles[activePage] || titles.dashboard;
   };
 
   return (
-    <div className="min-h-screen bg-[#EBF3FA] font-sans" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-      <div className="flex min-h-screen">
-        {/* Sidebar - Navy #0D1F4E */}
-        <aside className="w-64 bg-[#0D1F4E] flex flex-col fixed h-full z-10">
-          {/* Section 1: Logo Block */}
-          <div className="p-6 border-b border-[#1A4BA8]/30">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-[#0D1F4E] font-bold text-lg">EM</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">EMIT</h1>
-                <p className="text-xs text-[#637799]">Fianarantsoa</p>
-              </div>
-            </div>
-            <div className="inline-flex items-center px-2 py-1 bg-[#2D84E0]/20 rounded-lg">
-              <span className="text-xs text-[#2D84E0] font-medium">Gestion des Soutenances</span>
-            </div>
-          </div>
-
-          {/* Section 2: Scrollable Nav with Groups */}
-          <nav className="flex-1 overflow-y-auto py-4">
-            {navGroups.map((group, groupIndex) => (
-              <div key={groupIndex} className="mb-6">
-                <p className="px-4 mb-2 text-xs font-semibold text-[#637799] uppercase tracking-wider">
-                  {group.label}
-                </p>
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeMenu === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setActiveMenu(item.id);
-                        setActivePage(item.id);
-                      }}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-200 ${
-                        isActive
-                          ? 'border-l-4 border-[#2D84E0] bg-[rgba(45,132,224,0.22)] text-white font-bold'
-                          : 'text-[#637799] hover:text-white hover:bg-[#1A4BA8]/30'
-                      }`}
-                    >
-                      <Icon size={18} />
-                      <span>{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
-          </nav>
-
-          {/* Section 3: User Avatar + Name + Logout */}
-          <div className="p-4 border-t border-[#1A4BA8]/30">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-[#2D84E0] rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-white">Admin Scolarité</p>
-                <p className="text-xs text-[#637799]">admin@emit.mg</p>
-              </div>
-            </div>
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-[#637799] hover:text-white hover:bg-[#1A4BA8]/30 rounded-lg transition-all">
-              <LogOut size={16} />
-              <span>Déconnexion</span>
-            </button>
-          </div>
-        </aside>
-
-        {/* Right Column */}
-        <div className="flex-1 ml-64 flex flex-col">
-          {/* White Top Header */}
-          <header className="bg-white border-b border-[#DDEAF7] px-6 py-4">
-            <div className="flex items-center justify-between">
-              {/* Left: Page Title + Subtitle */}
-              <div>
-                <h1 className="text-xl font-bold text-[#0B1D3A]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-                  {getPageTitle().title}
-                </h1>
-                <p className="text-sm text-[#637799]">{getPageTitle().subtitle}</p>
-              </div>
-
-              {/* Right: EMIT/year badge + search + bell + avatar */}
-              <div className="flex items-center gap-4">
-                {/* year Badge */}
-                <div className="hidden sm:flex items-center px-3 py-1.5 bg-[#EAF4FF] rounded-lg">
-                  <span className="text-xs font-semibold text-[#1A4BA8]">EMIT 2026</span>
-                </div>
-
-                {/* Search Input */}
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#637799]" />
-                  <input
-                    type="text"
-                    placeholder="Rechercher..."
-                    className="pl-10 pr-4 py-2 bg-[#F0F5FB] border border-[#DDEAF7] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2D84E0] focus:border-transparent w-48"
-                  />
-                </div>
-
-                {/* Bell Icon */}
-                <button className="relative w-10 h-10 bg-[#F0F5FB] rounded-lg flex items-center justify-center hover:bg-[#EAF4FF] transition-colors">
-                  <Bell className="w-5 h-5 text-[#637799]" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#DC2626] rounded-full"></span>
-                </button>
-
-                {/* Avatar */}
-                <div className="w-10 h-10 bg-[#2D84E0] rounded-lg flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-              </div>
-            </div>
-          </header>
-
-          {/* Scrollable Main Content */}
-          <main className="flex-1 overflow-y-auto p-6">
+    <div className="w-full">
+      {/* Main Content */}
+      <main>
             {activePage === 'dashboard' && (
               <div>
                 {/* KPI Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                  <div className="bg-white rounded-lg p-4 border border-[#DDEAF7]">
-                    <p className="text-sm text-[#637799] mb-1">Total Soutenances</p>
-                    <p className="text-2xl font-bold text-[#0B1D3A]" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                      {soutenances.length}
-                    </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">Total Étudiants</p>
+                    <p className="text-4xl font-bold text-[#050840]">89</p>
                   </div>
-                  <div className="bg-white rounded-lg p-4 border border-[#DDEAF7]">
-                    <p className="text-sm text-[#637799] mb-1">Planifiées</p>
-                    <p className="text-2xl font-bold text-[#1A4BA8]" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                      {soutenances.filter(s => s.statut === 'planifiee').length}
-                    </p>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">Total Enseignants</p>
+                    <p className="text-4xl font-bold text-[#95C5F2]">24</p>
                   </div>
-                  <div className="bg-white rounded-lg p-4 border border-[#DDEAF7]">
-                    <p className="text-sm text-[#637799] mb-1">En cours</p>
-                    <p className="text-2xl font-bold text-[#2D84E0]" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                      {soutenances.filter(s => s.statut === 'en_cours').length}
-                    </p>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">Jurys Constitués</p>
+                    <p className="text-4xl font-bold text-[#050840]">18</p>
                   </div>
-                  <div className="bg-white rounded-lg p-4 border border-[#DDEAF7]">
-                    <p className="text-sm text-[#637799] mb-1">Terminées</p>
-                    <p className="text-2xl font-bold text-[#0D1F4E]" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                      {soutenances.filter(s => s.statut === 'termine').length}
-                    </p>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">Soutenances Planifiées</p>
+                    <p className="text-4xl font-bold text-[#050840]">{soutenances.filter(s => s.statut === 'planifiee').length}</p>
+                  </div>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">Évaluations Terminées</p>
+                    <p className="text-4xl font-bold text-[#95C5F2]">{soutenances.filter(s => s.statut === 'termine').length}</p>
+                  </div>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">En Cours</p>
+                    <p className="text-4xl font-bold text-[#050840]">{soutenances.filter(s => s.statut === 'en_cours').length}</p>
+                  </div>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">En Attente</p>
+                    <p className="text-4xl font-bold text-[#95C5F2]">{soutenances.filter(s => s.statut === 'en_attente').length}</p>
+                  </div>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">Annulées/Reportées</p>
+                    <p className="text-4xl font-bold text-[#050840]">{soutenances.filter(s => s.statut === 'annulee' || s.statut === 'reprogrammee').length}</p>
                   </div>
                 </div>
 
-                {/* Recent Activity */}
-                <div className="bg-white rounded-lg border border-[#DDEAF7] p-6">
-                  <h2 className="text-lg font-semibold text-[#0B1D3A] mb-4" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+                {/* Prochaines Soutenances */}
+                <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm mb-8">
+                  <h2 className="text-lg font-semibold text-[#050840] mb-4">
+                    Prochaines Soutenances
+                  </h2>
+                  <div className="space-y-4">
+                    {soutenances.slice(0, 3).map((soutenance) => (
+                      <div key={soutenance.id} className="flex items-center gap-4 p-4 bg-[#EBF3FA] rounded-2xl">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-[#050840]">{soutenance.etudiant}</p>
+                          <p className="text-xs text-slate-600">{soutenance.sujet}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-[#050840]">{soutenance.date}</p>
+                          <p className="text-xs text-slate-600">{soutenance.heure} • {soutenance.salle}</p>
+                        </div>
+                        {getStatusBadge(soutenance.statut)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Progression des Évaluations */}
+                <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm mb-8">
+                  <h2 className="text-lg font-semibold text-[#050840] mb-4">
+                    Progression des Évaluations
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm text-slate-600">Évaluations Terminées</span>
+                        <span className="text-sm font-medium text-[#050840]">{resultats.length}/42</span>
+                      </div>
+                      <div className="w-full bg-slate-200 rounded-full h-2">
+                        <div className="bg-[#95C5F2] h-2 rounded-full" style={{ width: '52%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm text-slate-600">En Cours</span>
+                        <span className="text-sm font-medium text-[#050840]">{soutenances.filter(s => s.statut === 'en_cours').length}/42</span>
+                      </div>
+                      <div className="w-full bg-slate-200 rounded-full h-2">
+                        <div className="bg-[#050840] h-2 rounded-full" style={{ width: '24%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm text-slate-600">En Attente</span>
+                        <span className="text-sm font-medium text-[#050840]">{soutenances.filter(s => s.statut === 'en_attente').length}/42</span>
+                      </div>
+                      <div className="w-full bg-slate-200 rounded-full h-2">
+                        <div className="bg-slate-400 h-2 rounded-full" style={{ width: '24%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Activité Récente */}
+                <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                  <h2 className="text-lg font-semibold text-[#050840] mb-4">
                     Activité Récente
                   </h2>
                   <div className="space-y-4">
                     {recentDepots.slice(0, 3).map((depot) => (
-                      <div key={depot.id} className="flex items-center gap-4 p-3 bg-[#F0F5FB] rounded-lg">
-                        <div className="w-10 h-10 bg-[#2D84E0] rounded-lg flex items-center justify-center">
-                          <span className="text-white font-semibold text-sm">{depot.initiales}</span>
+                      <div key={depot.id} className="flex items-center gap-4 p-4 bg-[#EBF3FA] rounded-2xl">
+                        <div className="w-12 h-12 bg-[#95C5F2] rounded-xl flex items-center justify-center">
+                          <span className="text-[#050840] font-semibold text-sm">{depot.initiales}</span>
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-[#0B1D3A]">{depot.etudiant}</p>
-                          <p className="text-xs text-[#637799]">{depot.promotion}</p>
+                          <p className="text-sm font-medium text-[#050840]">{depot.etudiant}</p>
+                          <p className="text-xs text text-slate-600">{depot.promotion}</p>
                         </div>
                         {getStatusBadge(depot.statut)}
                       </div>
@@ -464,73 +385,73 @@ const AdminDashboard = ({ currentPage, setCurrentPage, onLogout }) => {
             {activePage === 'soutenances' && (
               <div>
                 {/* Soutenances Table */}
-                <div className="bg-white rounded-lg border border-[#DDEAF7] overflow-hidden">
-                  <div className="p-4 border-b border-[#DDEAF7]">
-                    <h2 className="text-lg font-semibold text-[#0B1D3A]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-                  Liste des Soutenances
-                </h2>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-[#F0F5FB]">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Référence</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Étudiant</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Sujet</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Date+Heure</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Salle</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Jury</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Statut</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#DDEAF7]">
-                    {soutenances.map((soutenance) => (
-                      <tr key={soutenance.id} className="hover:bg-[#F0F5FB] transition-colors">
-                        <td className="px-4 py-3 text-sm font-mono text-[#0B1D3A]">{soutenance.reference}</td>
-                        <td className="px-4 py-3 text-sm text-[#0B1D3A]">{soutenance.etudiant}</td>
-                        <td className="px-4 py-3 text-sm text-[#637799] max-w-xs truncate">{soutenance.sujet}</td>
-                        <td className="px-4 py-3 text-sm text-[#0B1D3A]">{soutenance.date} {soutenance.heure}</td>
-                        <td className="px-4 py-3 text-sm text-[#0B1D3A]">{soutenance.salle}</td>
-                        <td className="px-4 py-3 text-sm text-[#637799] max-w-xs truncate">{soutenance.jury}</td>
-                        <td className="px-4 py-3">{getStatusBadge(soutenance.statut)}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            {(soutenance.statut === 'planifiee' || soutenance.statut === 'en_cours') && (
-                              <>
-                                <button className="text-xs text-[#2D84E0] hover:text-[#1A4BA8] font-medium">Reprogrammer</button>
-                                <button className="text-xs text-[#DC2626] hover:text-red-700 font-medium">Annuler</button>
-                              </>
-                            )}
-                            {soutenance.statut === 'annulee' && (
-                              <button className="text-xs text-[#2D84E0] hover:text-[#1A4BA8] font-medium">Replanifier</button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="p-6 border-b border-slate-200">
+                    <h2 className="text-lg font-semibold text-[#050840]">
+                      Liste des Soutenances
+                    </h2>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-[#EBF3FA]">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Référence</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Étudiant</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Sujet</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Date+Heure</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Salle</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Jury</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Statut</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {soutenances.map((soutenance) => (
+                          <tr key={soutenance.id} className="hover:bg-[#EBF3FA] transition-colors">
+                            <td className="px-6 py-4 text-sm font-mono text-[#050840]">{soutenance.reference}</td>
+                            <td className="px-6 py-4 text-sm text-[#050840]">{soutenance.etudiant}</td>
+                            <td className="px-6 py-4 text-sm text-slate-600 max-w-xs truncate">{soutenance.sujet}</td>
+                            <td className="px-6 py-4 text-sm text-[#050840]">{soutenance.date} {soutenance.heure}</td>
+                            <td className="px-6 py-4 text-sm text-[#050840]">{soutenance.salle}</td>
+                            <td className="px-6 py-4 text-sm text-slate-600 max-w-xs truncate">{soutenance.jury}</td>
+                            <td className="px-6 py-4">{getStatusBadge(soutenance.statut)}</td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-2">
+                                {(soutenance.statut === 'planifiee' || soutenance.statut === 'en_cours') && (
+                                  <>
+                                    <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Reprogrammer</button>
+                                    <button className="text-xs text-red-500 hover:text-red-700 font-medium">Annuler</button>
+                                  </>
+                                )}
+                                {soutenance.statut === 'annulee' && (
+                                  <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Replanifier</button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
 
                 {/* Info Panels */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                  <div className="bg-[#FEE2E2] border border-[#B91C1C] rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  <div className="bg-[#FFF1F1] border border-red-200 rounded-3xl p-6">
                     <div className="flex items-center gap-2 mb-2">
-                      <XCircle className="w-5 h-5 text-[#B91C1C]" />
-                      <h3 className="text-sm font-semibold text-[#B91C1C]">Soutenances Annulées</h3>
+                      <XCircle className="w-5 h-5 text-red-600" />
+                      <h3 className="text-sm font-semibold text-red-600">Soutenances Annulées</h3>
                     </div>
-                    <p className="text-2xl font-bold text-[#B91C1C]" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    <p className="text-2xl font-bold text-red-600">
                       {soutenances.filter(s => s.statut === 'annulee').length}
                     </p>
                   </div>
-                  <div className="bg-[#E0F2FE] border border-[#0369A1] rounded-lg p-4">
+                  <div className="bg-[#FEF3C7] border border-amber-200 rounded-3xl p-6">
                     <div className="flex items-center gap-2 mb-2">
-                      <ClockIcon className="w-5 h-5 text-[#0369A1]" />
-                      <h3 className="text-sm font-semibold text-[#0369A1]">Soutenances Reprogrammées</h3>
+                      <ClockIcon className="w-5 h-5 text-amber-600" />
+                      <h3 className="text-sm font-semibold text-amber-600">Soutenances Reprogrammées</h3>
                     </div>
-                    <p className="text-2xl font-bold text-[#0369A1]" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    <p className="text-2xl font-bold text-amber-600">
                       {soutenances.filter(s => s.statut === 'reprogrammee').length}
                     </p>
                   </div>
@@ -541,50 +462,50 @@ const AdminDashboard = ({ currentPage, setCurrentPage, onLogout }) => {
             {activePage === 'resultats' && (
               <div>
                 {/* Results Table */}
-                <div className="bg-white rounded-lg border border-[#DDEAF7] overflow-hidden">
-                  <div className="p-4 border-b border-[#DDEAF7] flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-[#0B1D3A]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-[#050840]">
                       Résultats des Soutenances
                     </h2>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-[#1A4BA8] text-white rounded-lg text-sm font-medium hover:bg-[#0D1F4E] transition-colors">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-[#050840] text-white rounded-xl text-sm font-medium hover:bg-[#050840]/90 transition-colors">
                       <Upload size={16} />
                       Publier tout
                     </button>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-[#F0F5FB]">
+                      <thead className="bg-[#EBF3FA]">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Étudiant</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Matricule</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Moyenne /20</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Mention</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Avis du jury</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Date</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Statut</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Actions</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Étudiant</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Matricule</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Moyenne /20</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Mention</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Avis du jury</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Date</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Statut</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#DDEAF7]">
+                      <tbody className="divide-y divide-slate-200">
                         {resultats.map((resultat) => (
-                          <tr key={resultat.id} className="hover:bg-[#F0F5FB] transition-colors">
-                            <td className="px-4 py-3 text-sm text-[#0B1D3A]">{resultat.etudiant}</td>
-                            <td className="px-4 py-3 text-sm font-mono text-[#0B1D3A]">{resultat.matricule}</td>
-                            <td className="px-4 py-3 text-2xl font-bold text-[#0B1D3A]" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                          <tr key={resultat.id} className="hover:bg-[#EBF3FA] transition-colors">
+                            <td className="px-6 py-4 text-sm text-[#050840]">{resultat.etudiant}</td>
+                            <td className="px-6 py-4 text-sm font-mono text-[#050840]">{resultat.matricule}</td>
+                            <td className="px-6 py-4 text-2xl font-bold text-[#050840]">
                               {resultat.moyenne}
                             </td>
-                            <td className="px-4 py-3 text-sm text-[#0B1D3A]">{resultat.mention}</td>
-                            <td className="px-4 py-3 text-sm text-[#637799] max-w-xs truncate">{resultat.avis}</td>
-                            <td className="px-4 py-3 text-sm text-[#0B1D3A]">{resultat.date}</td>
-                            <td className="px-4 py-3">{getStatusBadge(resultat.statut)}</td>
-                            <td className="px-4 py-3">
+                            <td className="px-6 py-4 text-sm text-[#050840]">{resultat.mention}</td>
+                            <td className="px-6 py-4 text-sm text-slate-600 max-w-xs truncate">{resultat.avis}</td>
+                            <td className="px-6 py-4 text-sm text-[#050840]">{resultat.date}</td>
+                            <td className="px-6 py-4">{getStatusBadge(resultat.statut)}</td>
+                            <td className="px-6 py-4">
                               <div className="flex items-center gap-2">
-                                <button className="flex items-center gap- px-2 py-1 bg-[#EAF4FF] text-[#1A4BA8] rounded-lg text-xs font-medium hover:bg-[#2D84E0] hover:text-white transition-colors">
+                                <button className="flex items-center gap-2 px-3 py-1.5 bg-[#EAF4FF] text-[#050840] rounded-xl text-xs font-medium hover:bg-[#95C5F2] transition-colors">
                                   <Download size={14} />
                                   PDF
                                 </button>
                                 {resultat.statut !== 'publie' && (
-                                  <button className="text-xs text-[#2D84E0] hover:text-[#1A4BA8] font-medium">Publier</button>
+                                  <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Publier</button>
                                 )}
                               </div>
                             </td>
@@ -597,38 +518,26 @@ const AdminDashboard = ({ currentPage, setCurrentPage, onLogout }) => {
               </div>
             )}
 
-            {(activePage === 'etudiants' || activePage === 'enseignants' || activePage === 'jurys') && (
+            {activePage === 'etudiants' && (
               <div>
-                {/* Warning Banner for Jurys */}
-                {activePage === 'jurys' && (
-                  <div className="bg-[#FEF3C7] border border-[#F59E0B] rounded-lg p-4 mb-4">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 text-[#F59E0B]" />
-                      <p className="text-sm font-medium text-[#92400E]">
-                        Rappel : Chaque jury doit comporter exactement 3 membres pour être valide.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
                 {/* Toolbar */}
-                <div className="bg-white rounded-lg border border-[#DDEAF7] p-4 mb-4">
+                <div className="bg-white rounded-3xl border border-slate-200 p-4 mb-6 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#637799]" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <input
                           type="text"
                           placeholder="Rechercher..."
-                          className="pl-10 pr-4 py-2 bg-[#F0F5FB] border border-[#DDEAF7] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2D84E0] w-64"
+                          className="pl-10 pr-4 py-2 bg-[#EBF3FA] border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#95C5F2] w-64"
                         />
                       </div>
-                      <button className="flex items-center gap-2 px-3 py-2 bg-[#EAF4FF] text-[#1A4BA8] rounded-lg text-sm font-medium hover:bg-[#2D84E0] hover:text-white transition-colors">
+                      <button className="flex items-center gap-2 px-3 py-2 bg-[#EAF4FF] text-[#050840] rounded-xl text-sm font-medium hover:bg-[#95C5F2] transition-colors">
                         <Download size={16} />
                         Exporter
                       </button>
                     </div>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-[#1A4BA8] text-white rounded-lg text-sm font-medium hover:bg-[#0D1F4E] transition-colors">
+                    <button className="flex items-center gap-2 px-4 py-2 bg-[#95C5F2] text-[#050840] rounded-xl text-sm font-medium hover:bg-[#7DB5EC] transition-colors">
                       <Plus size={16} />
                       Ajouter
                     </button>
@@ -636,32 +545,36 @@ const AdminDashboard = ({ currentPage, setCurrentPage, onLogout }) => {
                 </div>
 
                 {/* Data Table */}
-                <div className="bg-white rounded-lg border border-[#DDEAF7] overflow-hidden">
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-[#F0F5FB]">
+                      <thead className="bg-[#EBF3FA]">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Nom</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Email</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Statut</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-[#637799] uppercase tracking-wider">Actions</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Nom & Email</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Matricule</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Sujet de mémoire</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Directeur</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Date soutenance</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Statut</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-[#DDEAF7]">
-                        <tr className="hover:bg-[#F0F5FB] transition-colors">
-                          <td className="px-4 py-3 text-sm text-[#0B1D3A]">Rakoto Jean</td>
-                          <td className="px-4 py-3 text-sm text-[#637799]">rakoto.jean@emit.mg</td>
-                          <td className="px-4 py-3">{getStatusBadge('en_attente')}</td>
-                          <td className="px-4 py-3">
-                            <button className="text-xs text-[#2D84E0] hover:text-[#1A4BA8] font-medium">Modifier</button>
+                      <tbody className="divide-y divide-slate-200">
+                        <tr className="hover:bg-[#EBF3FA] transition-colors">
+                          <td className="px-6 py-4">
+                            <p className="text-sm font-medium text-[#050840]">Rakoto Jean</p>
+                            <p className="text-xs text-slate-600">rakoto.jean@emit.mg</p>
                           </td>
-                        </tr>
-                        <tr className="hover:bg-[#F0F5FB] transition-colors">
-                          <td className="px-4 py-3 text-sm text-[#0B1D3A]">Rasoa Marie</td>
-                          <td className="px-4 py-3 text-sm text-[#637799]">rasoa.marie@emit.mg</td>
-                          <td className="px-4 py-3">{getStatusBadge('valide')}</td>
-                          <td className="px-4 py-3">
-                            <button className="text-xs text-[#2D84E0] hover:text-[#1A4BA8] font-medium">Modifier</button>
+                          <td className="px-6 py-4 text-sm text-slate-600">MAT-2023-001</td>
+                          <td className="px-6 py-4 text-sm text-slate-600 max-w-xs truncate">Système de gestion de soutenances</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">Dr. Randria</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">2026-09-15</td>
+                          <td className="px-6 py-4">{getStatusBadge('en_attente')}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex gap-2">
+                              <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Modifier</button>
+                              <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Voir</button>
+                            </div>
                           </td>
                         </tr>
                       </tbody>
@@ -670,9 +583,439 @@ const AdminDashboard = ({ currentPage, setCurrentPage, onLogout }) => {
                 </div>
               </div>
             )}
+
+            {activePage === 'enseignants' && (
+              <div>
+                {/* Toolbar */}
+                <div className="bg-white rounded-3xl border border-slate-200 p-4 mb-6 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <button className="flex items-center gap-2 px-3 py-2 bg-[#EAF4FF] text-[#050840] rounded-xl text-sm font-medium hover:bg-[#95C5F2] transition-colors">
+                      <Download size={16} />
+                      Exporter
+                    </button>
+                    <button className="flex items-center gap-2 px-4 py-2 bg-[#95C5F2] text-[#050840] rounded-xl text-sm font-medium hover:bg-[#7DB5EC] transition-colors">
+                      <Plus size={16} />
+                      Ajouter
+                    </button>
+                  </div>
+                </div>
+
+                {/* Data Table */}
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-[#EBF3FA]">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Nom</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Grade</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Spécialité</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Département</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Nombre de jurys</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Disponibilité</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        <tr className="hover:bg-[#EBF3FA] transition-colors">
+                          <td className="px-6 py-4 text-sm text-[#050840]">Dr. Randria Jean</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">Maître de Conférences</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">Informatique</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">Informatique</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">5</td>
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#E1F8F0] text-[#065F46]">Disponible</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Modifier</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activePage === 'jurys' && (
+              <div>
+                {/* Warning Banner */}
+                <div className="bg-[#FEF3C7] border border-amber-200 rounded-3xl p-4 mb-6">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-amber-600" />
+                    <p className="text-sm font-medium text-amber-800">
+                      3 membres obligatoires par jury — Président, Rapporteur, Examinateur
+                    </p>
+                  </div>
+                </div>
+
+                {/* Data Table */}
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-[#EBF3FA]">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Référence jury</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Étudiant</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Président</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Rapporteur</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Examinateur</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Date</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Statut</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        <tr className="hover:bg-[#EBF3FA] transition-colors">
+                          <td className="px-6 py-4 text-sm text-slate-600">JURY-2026-001</td>
+                          <td className="px-6 py-4 text-sm text-[#050840]">Rakoto Jean</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">Dr. Randria</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">Pr. Rasoa</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">M. Andriamanitra</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">2026-09-15</td>
+                          <td className="px-6 py-4">{getStatusBadge('valide')}</td>
+                          <td className="px-6 py-4">
+                            <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Modifier</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activePage === 'creneaux' && (
+              <div>
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <p className="text-slate-500 text-sm mb-1">Période de soutenance</p>
+                    <p className="text-2xl font-bold text-[#050840]">15 Sept - 30 Oct 2026</p>
+                  </div>
+                  <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                    <p className="text-slate-500 text-sm mb-1">Total créneaux</p>
+                    <p className="text-2xl font-bold text-[#95C5F2]">42</p>
+                  </div>
+                </div>
+
+                {/* Data Table */}
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-[#EBF3FA]">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Référence</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Heure début</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Heure fin</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Jours</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Type</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actif</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        <tr className="hover:bg-[#EBF3FA] transition-colors">
+                          <td className="px-6 py-4 text-sm text-slate-600">CRN-001</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">08:00</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">10:00</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">Lun, Mer, Ven</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">Matin</td>
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#E1F8F0] text-[#065F46]">Oui</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Modifier</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activePage === 'calendrier' && (
+              <div>
+                {/* Week Navigation */}
+                <div className="flex items-center justify-between mb-6">
+                  <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-200 text-sm font-medium hover:bg-[#EBF3FA] transition-colors">
+                    <ChevronRight size={16} className="rotate-180" />
+                    Semaine précédente
+                  </button>
+                  <button className="px-4 py-2 bg-[#95C5F2] text-[#050840] rounded-xl text-sm font-medium hover:bg-[#7DB5EC] transition-colors">
+                    Aujourd'hui
+                  </button>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-200 text-sm font-medium hover:bg-[#EBF3FA] transition-colors">
+                    Semaine suivante
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+
+                {/* Weekly Calendar View */}
+                <div className="grid grid-cols-6 gap-4">
+                  {['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'].map((day, index) => (
+                    <div key={day} className="bg-white rounded-3xl border border-slate-200 p-4 shadow-sm">
+                      <div className="text-center mb-4">
+                        <p className="text-sm font-medium text-[#050840]">{day}</p>
+                        <p className="text-xs text-slate-600">15/09/2026</p>
+                      </div>
+                      <div className="space-y-2">
+                        {soutenances.slice(0, 2).map((soutenance) => (
+                          <div key={soutenance.id} className="bg-[#EBF3FA] rounded-xl p-3">
+                            <p className="text-xs font-medium text-[#050840]">{soutenance.heure}</p>
+                            <p className="text-xs text-slate-600 truncate">{soutenance.etudiant}</p>
+                            <p className="text-xs text-slate-500">{soutenance.salle}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activePage === 'affectation' && (
+              <div>
+                {/* 3-Step Stepper */}
+                <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm mb-6">
+                  <div className="flex items-center justify-between mb-8">
+                    {[1, 2, 3].map((step) => (
+                      <div key={step} className="flex items-center">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
+                          step === 1 ? 'bg-[#95C5F2] text-[#050840]' : 'bg-slate-200 text-slate-600'
+                        }`}>
+                          {step}
+                        </div>
+                        <div className="ml-3">
+                          <p className={`text-sm font-medium ${step === 1 ? 'text-[#050840]' : 'text-slate-500'}`}>
+                            {step === 1 ? 'Sélectionner une soutenance' : step === 2 ? 'Choisir les membres' : 'Confirmation'}
+                          </p>
+                        </div>
+                        {step < 3 && <div className="w-16 h-1 mx-4 bg-slate-200 rounded-full"></div>}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Step 1 Content */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-[#050840] mb-4">Soutenances sans jury</h3>
+                    <div className="space-y-3">
+                      {soutenances.slice(0, 3).map((soutenance) => (
+                        <div key={soutenance.id} className="flex items-center justify-between p-4 bg-[#EBF3FA] rounded-xl">
+                          <div>
+                            <p className="text-sm font-medium text-[#050840]">{soutenance.etudiant}</p>
+                            <p className="text-xs text-slate-600">{soutenance.sujet}</p>
+                          </div>
+                          <button className="px-4 py-2 bg-[#95C5F2] text-[#050840] rounded-xl text-sm font-medium hover:bg-[#7DB5EC] transition-colors">
+                            Sélectionner
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activePage === 'evaluations' && (
+              <div>
+                {/* Stat Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                  <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">Soumises</p>
+                    <p className="text-4xl font-bold text-[#050840]">42</p>
+                  </div>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">En attente</p>
+                    <p className="text-4xl font-bold text-[#95C5F2]">12</p>
+                  </div>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                    <p className="text-slate-500 text-sm mb-1">En cours</p>
+                    <p className="text-4xl font-bold text-[#050840]">8</p>
+                  </div>
+                  <div className="bg-white rounded-3xl p-6 shadow-sm border border-red-200">
+                    <p className="text-slate-500 text-sm mb-1">Conflits</p>
+                    <p className="text-4xl font-bold text-red-600">2</p>
+                  </div>
+                </div>
+
+                {/* Data Table */}
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-[#EBF3FA]">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Étudiant</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Jury</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Note Président</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Note Rapporteur</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Note Examinateur</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Moyenne</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Statut</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        <tr className="hover:bg-[#EBF3FA] transition-colors">
+                          <td className="px-6 py-4 text-sm text-[#050840]">Rakoto Jean</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">JURY-001</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">16</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">17</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">16</td>
+                          <td className="px-6 py-4 text-2xl font-bold text-[#050840]">16.33</td>
+                          <td className="px-6 py-4">{getStatusBadge('en_cours')}</td>
+                          <td className="px-6 py-4">
+                            <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Voir</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activePage === 'pv' && (
+              <div>
+                {/* Info Banner */}
+                <div className="bg-[#EAF4FF] border border-[#95C5F2] rounded-3xl p-4 mb-6">
+                  <div className="flex items-center gap-2">
+                    <Bell className="w-5 h-5 text-[#050840]" />
+                    <p className="text-sm font-medium text-[#050840]">
+                      PV générés automatiquement après validation des notes
+                    </p>
+                  </div>
+                </div>
+
+                {/* Toolbar */}
+                <div className="bg-white rounded-3xl border border-slate-200 p-4 mb-6 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <button className="flex items-center gap-2 px-3 py-2 bg-[#EAF4FF] text-[#050840] rounded-xl text-sm font-medium hover:bg-[#95C5F2] transition-colors">
+                      <Download size={16} />
+                      Tout télécharger
+                    </button>
+                    <button className="flex items-center gap-2 px-4 py-2 bg-[#95C5F2] text-[#050840] rounded-xl text-sm font-medium hover:bg-[#7DB5EC] transition-colors">
+                      <Plus size={16} />
+                      Générer PV
+                    </button>
+                  </div>
+                </div>
+
+                {/* Data Table */}
+                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mb-6">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead className="bg-[#EBF3FA]">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Référence PV</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Étudiant</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Date & Horaire</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Salle</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Généré le</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Statut</th>
+                          <th className="px-6 py-3 text-left text-xs font-semibold text-[#050840] uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        <tr className="hover:bg-[#EBF3FA] transition-colors">
+                          <td className="px-6 py-4 text-sm text-slate-600">PV-2026-001</td>
+                          <td className="px-6 py-4 text-sm text-[#050840]">Rakoto Jean</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">15/09/2026 09:00</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">Salle A101</td>
+                          <td className="px-6 py-4 text-sm text-slate-600">15/09/2026 11:30</td>
+                          <td className="px-6 py-4">{getStatusBadge('publie')}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex gap-2">
+                              <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Voir</button>
+                              <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">PDF</button>
+                              <button className="text-xs text-[#95C5F2] hover:text-[#050840] font-medium">Publier</button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* PV Preview */}
+                <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
+                  <div className="border-b border-slate-200 pb-6 mb-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-16 h-16 bg-white rounded-xl p-2 flex items-center justify-center border border-slate-200">
+                          <span className="text-[#050840] font-bold text-xl">EM</span>
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-[#050840]">EMIT</h2>
+                          <p className="text-sm text-slate-600">École de Management et d'Innovation Technologique</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-slate-600">PV N°: PV-2026-001</p>
+                        <p className="text-sm text-slate-600">Date: 15/09/2026</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#050840] mb-2">Composition du Jury</h3>
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <p className="text-slate-500">Président:</p>
+                          <p className="text-[#050840] font-medium">Dr. Randria</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">Rapporteur:</p>
+                          <p className="text-[#050840] font-medium">Pr. Rasoa</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">Examinateur:</p>
+                          <p className="text-[#050840] font-medium">M. Andriamanitra</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#050840] mb-2">Notes et Résultats</h3>
+                      <div className="bg-[#EBF3FA] rounded-xl p-4">
+                        <div className="grid grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <p className="text-slate-500">Note Président:</p>
+                            <p className="text-[#050840] font-bold text-xl">16/20</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-500">Note Rapporteur:</p>
+                            <p className="text-[#050840] font-bold text-xl">17/20</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-500">Note Examinateur:</p>
+                            <p className="text-[#050840] font-bold text-xl">16/20</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-500">Moyenne:</p>
+                            <p className="text-[#95C5F2] font-bold text-xl">16.33/20</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#050840] mb-2">Mention</h3>
+                      <p className="text-2xl font-bold text-[#050840]">Très Bien</p>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#050840] mb-2">Avis du Jury</h3>
+                      <p className="text-sm text-slate-600">
+                        Le candidat a présenté un travail de qualité supérieure. La maîtrise du sujet est excellente et les réponses aux questions du jury ont été pertinentes. Le jury recommande l'attribution de la mention Très Bien.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </main>
-        </div>
-      </div>
 
       {/* 4-Step Modal for Rescheduling */}
       {modalOpen && (

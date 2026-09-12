@@ -126,7 +126,7 @@ La Scolarité EMIT Fianarantsoa`
           <div className="p-6 border-b border-slate-200">
             <div className="flex items-center gap-3">
               <img 
-                src="/logo.emit.png" 
+                src="/Logo-emit.png" 
                 alt="Logo EMIT" 
                 className="w-12 h-12 rounded-2xl object-contain"
                 onError={(e) => {

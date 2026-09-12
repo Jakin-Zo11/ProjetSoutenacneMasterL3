@@ -28,7 +28,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           {/* Conteneur de logo */}
           <div className="w-12 h-12 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-md ring-2 ring-[#95C5F2]/20 flex-shrink-0">
             <img 
-              src="/logo.emit.png" 
+              src="/Logo-emit.png" 
               alt="Logo EMIT" 
               className="w-full h-full object-contain"
               onError={(e) => {
