@@ -82,6 +82,7 @@ class DefenseEvaluationController extends Controller
         $criterionIds = $evaluation->grid->criteria()->pluck('id')->sort()->values();
         $scoredIds = $evaluation->scores()->pluck('evaluation_criterion_id')->sort()->values();
         if ($criterionIds->isEmpty() || $criterionIds->all() !== $scoredIds->all()) {
+            return response()->json(['message' => 'Toutes les notes de la grille sont obligatoires avant validation.'], 422);
         }
         $this->recalculate($evaluation);
         $evaluation->update(['status' => 'validated', 'validated_at' => now()]);
