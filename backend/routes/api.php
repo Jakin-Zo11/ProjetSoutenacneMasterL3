@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\StudentController;
 use App\Modules\Evaluation\Http\Controllers\DefenseEvaluationController;
 use App\Modules\Evaluation\Http\Controllers\EvaluationGridController;
 
@@ -18,10 +19,23 @@ use App\Modules\Evaluation\Http\Controllers\EvaluationGridController;
 */
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    Route::prefix('student')->group(function () {
+        Route::get('/profile', [StudentController::class, 'profile']);
+        Route::put('/profile', [StudentController::class, 'updateProfile']);
+        Route::get('/submission', [StudentController::class, 'submission']);
+        Route::post('/submission', [StudentController::class, 'saveSubmission']);
+        Route::post('/submission/submit', [StudentController::class, 'submitSubmission']);
+        Route::get('/submission/files/{file}/download', [StudentController::class, 'downloadFile']);
+        Route::get('/notifications', [StudentController::class, 'notifications']);
+        Route::post('/notifications/{notification}/read', [StudentController::class, 'markNotificationAsRead']);
+        Route::post('/push-token', [StudentController::class, 'registerPushToken']);
+    });
 
     Route::get('/evaluation-grids', [EvaluationGridController::class, 'index']);
     Route::post('/evaluation-grids', [EvaluationGridController::class, 'store']);
