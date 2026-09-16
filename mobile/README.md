@@ -1,6 +1,34 @@
-# Welcome to your Expo app 👋
+# EMIT Soutenances Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Application mobile React Native pour les espaces **Étudiant** et **Jury**.
+L'administration reste dans le projet web `frontend/`.
+
+## API locale
+
+Pour un émulateur Android, l'application utilise par défaut `http://10.0.2.2:8000/api`.
+Pour un téléphone réel, définissez l'URL Laravel accessible sur le réseau avant de lancer Expo :
+
+```powershell
+$env:EXPO_PUBLIC_API_URL = "http://192.168.1.10:8000/api"
+npm start
+```
+
+Le backend doit être lancé avec `php artisan serve --host=0.0.0.0` pour être accessible depuis le téléphone.
+
+## Vérification
+
+```bash
+npm run typecheck
+npm start
+```
+
+## Fonctionnement
+
+- L'utilisateur choisit l'espace Étudiant ou Jury.
+- La connexion utilise `POST /api/v1/auth/login`.
+- Le token Sanctum est conservé dans `expo-secure-store`.
+
+Les écrans de données métier seront branchés aux endpoints Étudiant/Jury dès que ces routes seront disponibles côté Laravel.
 
 ## Get started
 

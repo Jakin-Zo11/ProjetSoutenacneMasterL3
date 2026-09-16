@@ -9,15 +9,34 @@ import {
   Image,
   StatusBar,
 } from 'react-native';
+import { login } from '../../services/api';
 
-const StudentLoginScreen: React.FC = () => {
-  const [matricule, setMatricule] = useState('');
+interface StudentLoginScreenProps {
+  onSuccess: () => void;
+}
+
+const StudentLoginScreen: React.FC<StudentLoginScreenProps> = ({ onSuccess }) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = () => {
-    // Login logic here
-    console.log('Login:', { matricule, password });
+  const handleLogin = async () => {
+    if (!email.trim() || !password) {
+      setErrorMessage('Veuillez renseigner votre email et votre mot de passe.');
+      return;
+    }
+    setIsLoading(true);
+    setErrorMessage('');
+    try {
+      await login(email.trim(), password);
+      onSuccess();
+    } catch {
+      setErrorMessage('Identifiants incorrects ou serveur indisponible.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -37,16 +56,17 @@ const StudentLoginScreen: React.FC = () => {
         <View style={styles.formContainer}>
           <Text style={styles.formTitle}>Connexion Étudiant</Text>
 
-          {/* Matricule */}
+            {/* Email */}
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Matricule</Text>
+            <Text style={styles.inputLabel}>Email étudiant</Text>
             <TextInput
               style={styles.input}
-              value={matricule}
-              onChangeText={setMatricule}
-              placeholder="Ex: MAT-2024-001"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="nom@emit.mg"
               placeholderTextColor="#9CA3AF"
-              autoCapitalize="characters"
+              autoCapitalize="none"
+              keyboardType="email-address"
             />
           </View>
 
@@ -69,8 +89,9 @@ const StudentLoginScreen: React.FC = () => {
           </View>
 
           {/* Bouton connexion */}
-          <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>Se connecter</Text>
+          {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
+          <TouchableOpacity onPress={handleLogin} disabled={isLoading} style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}>
+            <Text style={styles.loginButtonText}>{isLoading ? 'Connexion...' : 'Se connecter'}</Text>
           </TouchableOpacity>
 
           {/* Mot de passe oublié */}
@@ -175,6 +196,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
     fontFamily: 'Inter-SemiBold',
+  },
+  loginButtonDisabled: {
+    opacity: 0.6,
+  },
+  errorMessage: {
+    color: '#B42318',
+    fontSize: 13,
+    marginBottom: 10,
+    textAlign: 'center',
   },
   forgotPassword: {
     marginTop: 16,

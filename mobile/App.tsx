@@ -10,17 +10,27 @@ import {
 
 import StudentHomeScreen from './components/student/StudentHomeScreen';
 import JuryHomeScreen from './components/jury/JuryHomeScreen';
+import StudentLoginScreen from './components/student/StudentLoginScreen';
+import JuryLoginScreen from './components/jury/JuryLoginScreen';
 
-type MobileRole = 'student' | 'jury' | null;
+type MobileScreen = 'select' | 'student-login' | 'jury-login' | 'student' | 'jury';
 
 export default function App() {
-  const [role, setRole] = useState<MobileRole>(null);
+  const [screen, setScreen] = useState<MobileScreen>('select');
 
-  if (role === 'student') {
+  if (screen === 'student-login') {
+    return <StudentLoginScreen onSuccess={() => setScreen('student')} />;
+  }
+
+  if (screen === 'jury-login') {
+    return <JuryLoginScreen onSuccess={() => setScreen('jury')} />;
+  }
+
+  if (screen === 'student') {
     return <StudentHomeScreen />;
   }
 
-  if (role === 'jury') {
+  if (screen === 'jury') {
     return <JuryHomeScreen />;
   }
 
@@ -41,7 +51,7 @@ export default function App() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Accéder à l'espace étudiant"
-            onPress={() => setRole('student')}
+            onPress={() => setScreen('student-login')}
             style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
           >
             <Text style={styles.optionIcon}>🎓</Text>
@@ -57,7 +67,7 @@ export default function App() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Accéder à l'espace jury"
-            onPress={() => setRole('jury')}
+            onPress={() => setScreen('jury-login')}
             style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
           >
             <Text style={styles.optionIcon}>📋</Text>
