@@ -1,4 +1,19 @@
 {
-  "compilerOptions": {},
-  "extends": "expo/tsconfig.base"
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "App.tsx",
+    "components/common/**/*.tsx",
+    "components/jury/**/*.tsx",
+    "components/student/**/*.tsx",
+    "services/**/*.ts",
+    "expo-env.d.ts"
+  ]
 }
