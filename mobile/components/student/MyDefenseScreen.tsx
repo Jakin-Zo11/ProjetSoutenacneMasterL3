@@ -31,7 +31,9 @@ const JuryMember: React.FC<JuryMemberProps> = ({ name, role, isNew }) => (
   </View>
 );
 
-const MyDefenseScreen: React.FC = () => {
+interface ScreenProps { onBack: () => void }
+
+const MyDefenseScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const defenseData = {
     isReprogrammed: true,
     oldDate: '15 Déc 2024',
@@ -51,7 +53,7 @@ const MyDefenseScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="Ma soutenance" showBackButton showNotification />
+      <TopBar title="Ma soutenance" showBackButton onBackPress={onBack} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Reprogrammed Banner */}

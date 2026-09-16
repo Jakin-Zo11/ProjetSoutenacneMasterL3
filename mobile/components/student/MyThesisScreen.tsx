@@ -11,21 +11,23 @@ import {
 import TopBar from '../common/TopBar';
 import BottomNav from '../common/BottomNav';
 
-const MyThesisScreen: React.FC = () => {
+interface ScreenProps { onBack: () => void; submittedTheme?: string }
+
+const MyThesisScreen: React.FC<ScreenProps> = ({ onBack, submittedTheme }) => {
   const thesisData = {
-    title: 'Système de gestion de soutenances en ligne pour l\'EMIT Fianarantsoa',
+    title: submittedTheme || 'Aucun thème enregistré',
     specialty: 'Informatique - Systèmes et Réseaux',
     director: 'Prof. Randriamanana',
     coDirector: 'Dr. Rasoarimanana',
     depositDate: '15 Novembre 2024',
-    status: 'Validé',
+    status: submittedTheme ? 'Validé' : 'À renseigner',
     summary: 'Ce mémoire propose une solution numérique pour la gestion complète du processus de soutenances à l\'EMIT. Le système permet aux étudiants de déposer leurs travaux, aux jurys d\'évaluer en ligne, et à l\'administration de suivre l\'ensemble du processus de manière centralisée et sécurisée.',
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="Mon sujet de thèse" showBackButton showNotification />
+      <TopBar title="Mon sujet de thèse" showBackButton onBackPress={onBack} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Thesis Title Card */}

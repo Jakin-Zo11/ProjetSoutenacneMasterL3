@@ -57,7 +57,9 @@ const StudentCard: React.FC<StudentCardProps> = ({ studentName, studentMatricule
   );
 };
 
-const MyStudentsScreen: React.FC = () => {
+interface ScreenProps { onBack: () => void }
+
+const MyStudentsScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const students = [
     {
       studentName: 'Rakoto Jean',
@@ -103,7 +105,7 @@ const MyStudentsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="Mes étudiants" showBackButton showNotification />
+      <TopBar title="Mes étudiants" showBackButton onBackPress={onBack} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.studentsList}>

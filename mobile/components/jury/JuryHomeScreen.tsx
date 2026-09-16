@@ -20,7 +20,12 @@ interface EvaluationItemProps {
   status: string;
 }
 
-const EvaluationItem: React.FC<EvaluationItemProps> = ({ studentName, studentMatricule, role, date, room, status }) => {
+interface JuryHomeScreenProps {
+  onNavigate: (screen: string) => void;
+  onExit: () => void;
+}
+
+const EvaluationItem: React.FC<EvaluationItemProps & { onPress: () => void }> = ({ studentName, studentMatricule, role, date, room, status, onPress }) => {
   const getStatusColor = () => {
     switch (status) {
       case 'À évaluer': return '#EAF4FF';
@@ -38,7 +43,7 @@ const EvaluationItem: React.FC<EvaluationItemProps> = ({ studentName, studentMat
   };
 
   return (
-    <TouchableOpacity style={styles.evaluationItem}>
+    <TouchableOpacity style={styles.evaluationItem} onPress={onPress}>
       <View style={styles.evaluationAvatar}>
         <Text style={styles.evaluationAvatarText}>{studentName.charAt(0)}</Text>
       </View>
@@ -58,7 +63,7 @@ const EvaluationItem: React.FC<EvaluationItemProps> = ({ studentName, studentMat
   );
 };
 
-const JuryHomeScreen: React.FC = () => {
+const JuryHomeScreen: React.FC<JuryHomeScreenProps> = ({ onNavigate, onExit }) => {
   const juryData = {
     name: 'Prof. Randriamanana',
     grade: 'Maître de Conférences',
@@ -100,7 +105,7 @@ const JuryHomeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="EMIT" showNotification />
+      <TopBar title="EMIT" showBackButton onBackPress={onExit} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
@@ -133,7 +138,7 @@ const JuryHomeScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>Prochaines évaluations</Text>
           <View style={styles.evaluationsList}>
             {upcomingEvaluations.map((evaluation, index) => (
-              <EvaluationItem key={index} {...evaluation} />
+              <EvaluationItem key={index} {...evaluation} onPress={() => onNavigate('jury-defense')} />
             ))}
           </View>
         </View>
@@ -146,7 +151,7 @@ const JuryHomeScreen: React.FC = () => {
           { id: 'history', icon: '📋', label: 'Historique' },
         ]}
         activeTab="home"
-        onTabChange={() => {}}
+        onTabChange={(tab) => onNavigate(tab === 'students' ? 'jury-students' : 'jury-history')}
       />
     </SafeAreaView>
   );

@@ -11,7 +11,9 @@ import {
 import TopBar from '../common/TopBar';
 import BottomNav from '../common/BottomNav';
 
-const MyPvScreen: React.FC = () => {
+interface ScreenProps { onBack: () => void }
+
+const MyPvScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const pvData = {
     isAvailable: true,
   };
@@ -20,7 +22,7 @@ const MyPvScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-        <TopBar title="PV de soutenance" showBackButton showNotification />
+        <TopBar title="PV de soutenance" showBackButton onBackPress={onBack} showNotification />
         
         <View style={styles.waitingContainer}>
           <Text style={styles.waitingIcon}>📄</Text>
@@ -47,7 +49,7 @@ const MyPvScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="PV de soutenance" showBackButton showNotification />
+      <TopBar title="PV de soutenance" showBackButton onBackPress={onBack} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* PV Info Card */}

@@ -60,40 +60,35 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ type, title, timest
   );
 };
 
-const NotificationsScreen: React.FC = () => {
-  const notifications = [
-    {
-      type: 'reprogrammed' as const,
-      title: 'Soutenance reprogrammée',
-      timestamp: 'Il y a 2 heures',
-      description: 'Votre soutenance a été reprogrammée suite à une indisponibilité du jury.',
-      details: 'Ancien créneau : 15 Déc 2024 à 14:00 (Salle B203)\nNouveau créneau : 20 Déc 2024 à 09:00 (Salle A101)',
-    },
-    {
-      type: 'info' as const,
-      title: 'Membre de jury remplacé',
-      timestamp: 'Il y a 5 heures',
-      description: 'Le rapporteur Dr. Rasoarimanana a été remplacé par Dr. Ravelonarivo.',
-      details: 'Nouveau rapporteur : Dr. Ravelonarivo',
-    },
+interface ScreenProps { onBack: () => void; convocationReady: boolean; defenseCompleted?: boolean }
+
+const NotificationsScreen: React.FC<ScreenProps> = ({ onBack, convocationReady, defenseCompleted = false }) => {
+  const notifications = convocationReady ? [
     {
       type: 'info' as const,
       title: 'Convocation disponible',
-      timestamp: 'Hier',
-      description: 'Votre convocation officielle est maintenant disponible dans l\'application.',
+      timestamp: 'À l\'instant',
+      description: 'Votre convocation officielle et les détails de votre soutenance sont disponibles.',
+      details: '20 Décembre 2024 à 09:00 · Salle A101',
     },
-  ];
+    ...(defenseCompleted ? [{
+      type: 'info' as const,
+      title: 'Résultat et PV disponibles',
+      timestamp: 'À l\'instant',
+      description: 'Votre PV de soutenance et votre résultat sont maintenant disponibles.',
+    }] : []),
+  ] : [];
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="Notifications" showBackButton showNotification />
+      <TopBar title="Notifications" showBackButton onBackPress={onBack} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.notificationsList}>
-          {notifications.map((notification, index) => (
+          {notifications.length ? notifications.map((notification, index) => (
             <NotificationItem key={index} {...notification} />
-          ))}
+          )) : <Text style={styles.emptyText}>Aucune notification pour le moment. La convocation apparaîtra après la préparation de votre soutenance.</Text>}
         </View>
       </ScrollView>
 
@@ -188,6 +183,13 @@ const styles = StyleSheet.create({
     color: '#1A4BA8',
     lineHeight: 18,
     fontFamily: 'Inter-Regular',
+  },
+  emptyText: {
+    color: '#667085',
+    fontSize: 14,
+    lineHeight: 21,
+    padding: 20,
+    textAlign: 'center',
   },
 });
 

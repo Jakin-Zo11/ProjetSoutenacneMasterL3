@@ -10,57 +10,60 @@ import {
 } from 'react-native';
 import TopBar from '../common/TopBar';
 import BottomNav from '../common/BottomNav';
+import { StudentProfile } from './StudentLoginScreen';
 
 interface ShortcutCardProps {
   icon: string;
   title: string;
+  locked?: boolean;
   onPress: () => void;
 }
 
-const ShortcutCard: React.FC<ShortcutCardProps> = ({ icon, title, onPress }) => (
-  <TouchableOpacity onPress={onPress} style={styles.shortcutCard}>
+interface StudentHomeScreenProps {
+  student: StudentProfile;
+  themeSubmitted: boolean;
+  convocationReady: boolean;
+  onNavigate: (screen: string) => void;
+  onOpenTheme: () => void;
+  onExit: () => void;
+}
+
+const ShortcutCard: React.FC<ShortcutCardProps> = ({ icon, title, locked, onPress }) => (
+  <TouchableOpacity onPress={onPress} disabled={locked} style={[styles.shortcutCard, locked && styles.shortcutCardLocked]}>
     <View style={styles.shortcutIcon}>
       <Text style={styles.shortcutIconText}>{icon}</Text>
     </View>
     <Text style={styles.shortcutTitle}>{title}</Text>
+    {locked ? <Text style={styles.lockedText}>Après soutenance</Text> : null}
   </TouchableOpacity>
 );
 
-const StudentHomeScreen: React.FC = () => {
-  const studentData = {
-    name: 'Rakoto Jean',
-    matricule: 'MAT-2024-001',
-    daysUntilDefense: 5,
-    defenseDate: '20 Déc 2024',
-    defenseTime: '09:00',
-    defenseRoom: 'Salle A101',
-    defenseStatus: 'Confirmée',
-  };
+const StudentHomeScreen: React.FC<StudentHomeScreenProps> = ({ student, themeSubmitted, convocationReady, onNavigate, onOpenTheme, onExit }) => {
 
   const shortcuts = [
-    { icon: '📅', title: 'Ma soutenance' },
-    { icon: '📄', title: 'Ma convocation' },
-    { icon: '📚', title: 'Mon sujet de thèse' },
-    { icon: '📊', title: 'Mon résultat' },
-    { icon: '📝', title: 'PV de soutenance' },
-    { icon: '🔔', title: 'Notifications' },
+    { icon: '📅', title: 'Ma soutenance', screen: 'student-defense', locked: !convocationReady },
+    { icon: '📄', title: 'Ma convocation', screen: 'student-convocation', locked: !convocationReady },
+    { icon: '📚', title: 'Mon sujet de thèse', screen: 'student-thesis' },
+    { icon: '📊', title: 'Mon résultat', screen: 'student-result', locked: true },
+    { icon: '📝', title: 'PV de soutenance', screen: 'student-pv', locked: true },
+    { icon: '🔔', title: 'Notifications', screen: 'student-notifications', locked: true },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="EMIT" showNotification />
+      <TopBar title="EMIT" showBackButton onBackPress={onExit} showNotification={convocationReady} onNotificationPress={() => onNavigate('student-notifications')} />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <View>
-              <Text style={styles.studentName}>{studentData.name}</Text>
-              <Text style={styles.studentMatricule}>{studentData.matricule}</Text>
+              <Text style={styles.studentName}>{student.name}</Text>
+              <Text style={styles.studentMatricule}>{student.matricule}</Text>
             </View>
             <View style={styles.defenseBadge}>
-              <Text style={styles.defenseBadgeText}>Soutenance dans {studentData.daysUntilDefense} jours</Text>
+              <Text style={styles.defenseBadgeText}>{convocationReady ? 'Convocation disponible' : 'En attente de convocation'}</Text>
             </View>
           </View>
         </View>
@@ -70,25 +73,39 @@ const StudentHomeScreen: React.FC = () => {
           <View style={styles.defenseInfoRow}>
             <View style={styles.defenseInfoItem}>
               <Text style={styles.defenseInfoLabel}>Date</Text>
-              <Text style={styles.defenseInfoValue}>{studentData.defenseDate}</Text>
+                <Text style={styles.defenseInfoValue}>{convocationReady ? '20 Décembre 2024' : 'À venir'}</Text>
             </View>
             <View style={styles.defenseInfoItem}>
               <Text style={styles.defenseInfoLabel}>Heure</Text>
-              <Text style={styles.defenseInfoValue}>{studentData.defenseTime}</Text>
+                <Text style={styles.defenseInfoValue}>{convocationReady ? '09:00' : 'À définir'}</Text>
             </View>
           </View>
           <View style={styles.defenseInfoRow}>
             <View style={styles.defenseInfoItem}>
               <Text style={styles.defenseInfoLabel}>Salle</Text>
-              <Text style={styles.defenseInfoValue}>{studentData.defenseRoom}</Text>
+                <Text style={styles.defenseInfoValue}>{convocationReady ? 'Salle A101' : 'À définir'}</Text>
             </View>
             <View style={styles.defenseInfoItem}>
               <Text style={styles.defenseInfoLabel}>Statut</Text>
               <View style={styles.statusBadge}>
-                <Text style={styles.statusBadgeText}>{studentData.defenseStatus}</Text>
+                <Text style={styles.statusBadgeText}>{convocationReady ? 'Confirmée' : 'Convocation attendue'}</Text>
               </View>
             </View>
           </View>
+        </View>
+
+        <View style={styles.profileCard}>
+          <Text style={styles.cardTitle}>Mon parcours</Text>
+          <Text style={styles.profileName}>{student.name}</Text>
+          <Text style={styles.profileMeta}>{student.email} · {student.status}</Text>
+          <Text style={styles.profileValue}>{student.formation}</Text>
+          <Text style={styles.profileMeta}>{student.promotion}</Text>
+        </View>
+
+        <View style={styles.themeCard}>
+          <Text style={styles.cardTitle}>{themeSubmitted ? 'Thème validé' : 'Action requise'}</Text>
+          <Text style={styles.themeDescription}>{themeSubmitted ? 'Votre thème est validé. La convocation sera disponible dans quelques instants.' : 'Vous devez renseigner votre thème de stage ou mémoire.'}</Text>
+          {!themeSubmitted ? <TouchableOpacity style={styles.themeButton} onPress={onOpenTheme}><Text style={styles.themeButtonText}>Renseigner mon thème</Text></TouchableOpacity> : null}
         </View>
 
         {/* Notification Banner (if needed) */}
@@ -100,8 +117,8 @@ const StudentHomeScreen: React.FC = () => {
         <View style={styles.shortcutsSection}>
           <Text style={styles.sectionTitle}>Raccourcis</Text>
           <View style={styles.shortcutsGrid}>
-            {shortcuts.map((shortcut, index) => (
-              <ShortcutCard key={index} {...shortcut} onPress={() => {}} />
+            {shortcuts.map((shortcut) => (
+              <ShortcutCard key={shortcut.screen} {...shortcut} onPress={() => { if (!shortcut.locked) onNavigate(shortcut.screen); }} />
             ))}
           </View>
         </View>
@@ -115,7 +132,7 @@ const StudentHomeScreen: React.FC = () => {
           { id: 'profile', icon: '👤', label: 'Profil' },
         ]}
         activeTab="home"
-        onTabChange={() => {}}
+        onTabChange={(tab) => onNavigate(tab === 'defense' ? 'student-defense' : tab === 'thesis' ? 'student-thesis' : 'student-profile')}
       />
     </SafeAreaView>
   );
@@ -175,6 +192,61 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 8,
+  },
+  profileCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    marginHorizontal: 20,
+    marginTop: 16,
+    padding: 20,
+  },
+  themeCard: {
+    backgroundColor: '#FFF8E8',
+    borderColor: '#F2D18A',
+    borderRadius: 20,
+    borderWidth: 1,
+    marginHorizontal: 20,
+    marginTop: 16,
+    padding: 20,
+  },
+  cardTitle: {
+    color: '#0D1F4E',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  profileName: {
+    color: '#0D1F4E',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  profileValue: {
+    color: '#1A4BA8',
+    fontSize: 15,
+    fontWeight: '600',
+    marginTop: 14,
+  },
+  profileMeta: {
+    color: '#667085',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  themeDescription: {
+    color: '#6B4E16',
+    fontSize: 13,
+    lineHeight: 19,
+  },
+  themeButton: {
+    alignItems: 'center',
+    backgroundColor: '#E5B45F',
+    borderRadius: 10,
+    marginTop: 14,
+    paddingVertical: 12,
+  },
+  themeButtonText: {
+    color: '#0D1F4E',
+    fontSize: 13,
+    fontWeight: '700',
   },
   defenseInfoRow: {
     flexDirection: 'row',
@@ -252,6 +324,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
+  shortcutCardLocked: {
+    opacity: 0.48,
+  },
   shortcutIcon: {
     width: 48,
     height: 48,
@@ -270,6 +345,12 @@ const styles = StyleSheet.create({
     color: '#0D1F4E',
     textAlign: 'center',
     fontFamily: 'Inter-SemiBold',
+  },
+  lockedText: {
+    color: '#667085',
+    fontSize: 10,
+    marginTop: 5,
+    textAlign: 'center',
   },
 });
 

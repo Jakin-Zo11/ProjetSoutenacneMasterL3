@@ -71,7 +71,7 @@ const AdminHomeScreen: React.FC = () => {
           <View style={styles.headerContent}>
             <View style={styles.headerLeft}>
               <Image
-                source={require('../../assets/images/emit-logo.png')}
+                source={require('../../assets/images/Logo-emit.png')}
                 style={styles.logo}
                 resizeMode="contain"
               />

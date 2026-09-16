@@ -11,7 +11,9 @@ import {
 import TopBar from '../common/TopBar';
 import BottomNav from '../common/BottomNav';
 
-const StudentProfileScreen: React.FC = () => {
+interface ScreenProps { onBack: () => void }
+
+const StudentProfileScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const studentData = {
     initials: 'RJ',
     name: 'Rakoto Jean',
@@ -26,7 +28,7 @@ const StudentProfileScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="Mon profil" showBackButton showNotification />
+      <TopBar title="Mon profil" showBackButton onBackPress={onBack} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Profile Header */}

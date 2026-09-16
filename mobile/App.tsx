@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Pressable,
   SafeAreaView,
@@ -10,28 +10,79 @@ import {
 
 import StudentHomeScreen from './components/student/StudentHomeScreen';
 import JuryHomeScreen from './components/jury/JuryHomeScreen';
-import StudentLoginScreen from './components/student/StudentLoginScreen';
 import JuryLoginScreen from './components/jury/JuryLoginScreen';
+import MyConvocationScreen from './components/student/MyConvocationScreen';
+import MyDefenseScreen from './components/student/MyDefenseScreen';
+import MyPvScreen from './components/student/MyPvScreen';
+import MyResultScreen from './components/student/MyResultScreen';
+import MyThesisScreen from './components/student/MyThesisScreen';
+import NotificationsScreen from './components/student/NotificationsScreen';
+import StudentProfileScreen from './components/student/StudentProfileScreen';
+import StudentLoginScreen, { StudentProfile } from './components/student/StudentLoginScreen';
+import StudentThemeScreen from './components/student/StudentThemeScreen';
+import DefenseDetailsScreen from './components/jury/DefenseDetailsScreen';
+import HistoryScreen from './components/jury/HistoryScreen';
+import MyStudentsScreen from './components/jury/MyStudentsScreen';
+import EvaluationFormScreen from './components/jury/EvaluationFormScreen';
 
-type MobileScreen = 'select' | 'student-login' | 'jury-login' | 'student' | 'jury';
+type MobileScreen =
+  | 'select' | 'student-access' | 'student-theme' | 'jury-login' | 'student' | 'jury'
+  | 'student-defense' | 'student-convocation' | 'student-thesis'
+  | 'student-result' | 'student-pv' | 'student-notifications' | 'student-profile'
+  | 'jury-defense' | 'jury-history' | 'jury-students' | 'jury-evaluation';
 
 export default function App() {
   const [screen, setScreen] = useState<MobileScreen>('select');
+  const [student, setStudent] = useState<StudentProfile | null>(null);
+  const [themeSubmitted, setThemeSubmitted] = useState(false);
+  const [submittedTheme, setSubmittedTheme] = useState('');
+  const [convocationReady, setConvocationReady] = useState(false);
 
-  if (screen === 'student-login') {
-    return <StudentLoginScreen onSuccess={() => setScreen('student')} />;
+  useEffect(() => {
+    if (!themeSubmitted) {
+      setConvocationReady(false);
+      return;
+    }
+    const timer = setTimeout(() => setConvocationReady(true), 15000);
+    return () => clearTimeout(timer);
+  }, [themeSubmitted]);
+
+  if (screen === 'student-access') {
+    return <StudentLoginScreen onSuccess={(profile) => { setStudent(profile); setScreen('student'); }} onBack={() => setScreen('select')} />;
   }
 
   if (screen === 'jury-login') {
-    return <JuryLoginScreen onSuccess={() => setScreen('jury')} />;
+    return <JuryLoginScreen onSuccess={() => setScreen('jury')} onBack={() => setScreen('select')} />;
   }
 
-  if (screen === 'student') {
-    return <StudentHomeScreen />;
+  if (screen === 'student-theme') {
+    return <StudentThemeScreen onBack={() => setScreen('student')} onSubmit={(theme) => { setSubmittedTheme(theme); setThemeSubmitted(true); setScreen('student'); }} />;
   }
 
   if (screen === 'jury') {
-    return <JuryHomeScreen />;
+    return <JuryHomeScreen onNavigate={(nextScreen) => setScreen(nextScreen as MobileScreen)} onExit={() => setScreen('select')} />;
+  }
+
+  const goToStudentHome = () => setScreen('student');
+  const goToJuryHome = () => setScreen('jury');
+
+  if (screen === 'student-defense') return <MyDefenseScreen onBack={goToStudentHome} />;
+  if (screen === 'student-convocation') return <MyConvocationScreen onBack={goToStudentHome} />;
+  if (screen === 'student-thesis') return <MyThesisScreen submittedTheme={submittedTheme} onBack={goToStudentHome} />;
+  if (screen === 'student-result') return <MyResultScreen onBack={goToStudentHome} />;
+  if (screen === 'student-pv') return <MyPvScreen onBack={goToStudentHome} />;
+  if (screen === 'student-notifications') return <NotificationsScreen convocationReady={convocationReady} onBack={goToStudentHome} />;
+  if (screen === 'student-profile') return <StudentProfileScreen onBack={goToStudentHome} />;
+  if (screen === 'jury-defense') return <DefenseDetailsScreen onBack={goToJuryHome} onEvaluate={() => setScreen('jury-evaluation')} />;
+  if (screen === 'jury-history') return <HistoryScreen onBack={goToJuryHome} />;
+  if (screen === 'jury-students') return <MyStudentsScreen onBack={goToJuryHome} />;
+  if (screen === 'jury-evaluation') return <EvaluationFormScreen onBack={goToJuryHome} />;
+
+  if (screen === 'student') {
+    if (!student) {
+      return <StudentLoginScreen onSuccess={(profile) => { setStudent(profile); setScreen('student'); }} onBack={() => setScreen('select')} />;
+    }
+    return <StudentHomeScreen student={student} themeSubmitted={themeSubmitted} convocationReady={convocationReady} onNavigate={(nextScreen) => setScreen(nextScreen as MobileScreen)} onOpenTheme={() => setScreen('student-theme')} onExit={() => { setStudent(null); setThemeSubmitted(false); setSubmittedTheme(''); setScreen('select'); }} />;
   }
 
   return (
@@ -51,7 +102,7 @@ export default function App() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Accéder à l'espace étudiant"
-            onPress={() => setScreen('student-login')}
+            onPress={() => setScreen('student-access')}
             style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
           >
             <Text style={styles.optionIcon}>🎓</Text>

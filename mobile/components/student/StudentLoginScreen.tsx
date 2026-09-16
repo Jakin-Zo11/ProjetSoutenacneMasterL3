@@ -9,31 +9,58 @@ import {
   Image,
   StatusBar,
 } from 'react-native';
-import { login } from '../../services/api';
-
-interface StudentLoginScreenProps {
-  onSuccess: () => void;
+export interface StudentProfile {
+  name: string;
+  matricule: string;
+  formation: string;
+  promotion: string;
+  email: string;
+  status: string;
 }
 
-const StudentLoginScreen: React.FC<StudentLoginScreenProps> = ({ onSuccess }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+interface StudentLoginScreenProps {
+  onSuccess: (student: StudentProfile) => void;
+  onBack: () => void;
+}
+
+function findStudentByMatricule(matricule: string): StudentProfile | null {
+  const match = /^(\d{3})([A-Z])(\d{2})$/.exec(matricule);
+  if (!match) return null;
+
+  const [, number, parcoursCode, year] = match;
+  const formation = parcoursCode === 'I' ? 'Informatique de Gestion' : `Parcours ${parcoursCode}`;
+  const fullYear = `20${year}`;
+  return {
+    name: `Étudiant ${number}`,
+    matricule,
+    formation,
+    promotion: `Promotion ${year} · ${fullYear}-${Number(fullYear) + 1}`,
+    email: `matricule.${matricule.toLowerCase()}@emit.mg`,
+    status: 'Actif',
+  };
+}
+
+const StudentLoginScreen: React.FC<StudentLoginScreenProps> = ({ onSuccess, onBack }) => {
+  const [matricule, setMatricule] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
-    if (!email.trim() || !password) {
-      setErrorMessage('Veuillez renseigner votre email et votre mot de passe.');
+    const normalizedMatricule = matricule.trim().toUpperCase();
+    if (!normalizedMatricule) {
+      setErrorMessage('Veuillez renseigner votre matricule.');
       return;
     }
     setIsLoading(true);
     setErrorMessage('');
     try {
-      await login(email.trim(), password);
-      onSuccess();
-    } catch {
-      setErrorMessage('Identifiants incorrects ou serveur indisponible.');
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      const student = findStudentByMatricule(normalizedMatricule);
+      if (!student) {
+        setErrorMessage('Format invalide. Exemple attendu : 000I24 ou 001I23.');
+        return;
+      }
+      onSuccess(student);
     } finally {
       setIsLoading(false);
     }
@@ -43,10 +70,13 @@ const StudentLoginScreen: React.FC<StudentLoginScreenProps> = ({ onSuccess }) =>
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
       <View style={styles.content}>
+        <TouchableOpacity onPress={onBack} style={styles.backButton} accessibilityLabel="Retour">
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
         {/* Logo EMIT */}
         <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/images/emit-logo.png')}
+            source={require('../../assets/images/Logo-emit.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -54,49 +84,25 @@ const StudentLoginScreen: React.FC<StudentLoginScreenProps> = ({ onSuccess }) =>
 
         {/* Form */}
         <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>Connexion Étudiant</Text>
+          <Text style={styles.formTitle}>Accès étudiant</Text>
+          <Text style={styles.formSubtitle}>Entrez votre matricule pour consulter votre parcours.</Text>
 
-            {/* Email */}
+          {/* Matricule */}
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Email étudiant</Text>
+            <Text style={styles.inputLabel}>Matricule</Text>
             <TextInput
               style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="nom@emit.mg"
+              value={matricule}
+              onChangeText={setMatricule}
+              placeholder="Ex : 000I24"
               placeholderTextColor="#9CA3AF"
-              autoCapitalize="none"
-              keyboardType="email-address"
+              autoCapitalize="characters"
             />
           </View>
 
-          {/* Mot de passe */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Mot de passe</Text>
-            <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
-                value={password}
-                onChangeText={setPassword}
-                placeholder="••••••••"
-                placeholderTextColor="#9CA3AF"
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
-                <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Bouton connexion */}
           {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
           <TouchableOpacity onPress={handleLogin} disabled={isLoading} style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}>
-            <Text style={styles.loginButtonText}>{isLoading ? 'Connexion...' : 'Se connecter'}</Text>
-          </TouchableOpacity>
-
-          {/* Mot de passe oublié */}
-          <TouchableOpacity style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
+            <Text style={styles.loginButtonText}>{isLoading ? 'Recherche...' : 'Voir mon espace'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -139,6 +145,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 32,
     fontFamily: 'PlusJakartaSans-Bold',
+  },
+  formSubtitle: {
+    color: '#667085',
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  backButton: {
+    left: 16,
+    padding: 8,
+    position: 'absolute',
+    top: 16,
+  },
+  backIcon: {
+    color: '#FFFFFF',
+    fontSize: 28,
   },
   inputContainer: {
     marginBottom: 20,

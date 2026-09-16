@@ -13,9 +13,10 @@ import { login } from '../../services/api';
 
 interface JuryLoginScreenProps {
   onSuccess: () => void;
+  onBack: () => void;
 }
 
-const JuryLoginScreen: React.FC<JuryLoginScreenProps> = ({ onSuccess }) => {
+const JuryLoginScreen: React.FC<JuryLoginScreenProps> = ({ onSuccess, onBack }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -43,10 +44,13 @@ const JuryLoginScreen: React.FC<JuryLoginScreenProps> = ({ onSuccess }) => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
       <View style={styles.content}>
+        <TouchableOpacity onPress={onBack} style={styles.backButton} accessibilityLabel="Retour">
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
         {/* Logo EMIT */}
         <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/images/emit-logo.png')}
+            source={require('../../assets/images/Logo-emit.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -118,6 +122,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
+  },
+  backButton: {
+    left: 16,
+    padding: 8,
+    position: 'absolute',
+    top: 16,
+  },
+  backIcon: {
+    color: '#FFFFFF',
+    fontSize: 28,
   },
   logoContainer: {
     alignItems: 'center',

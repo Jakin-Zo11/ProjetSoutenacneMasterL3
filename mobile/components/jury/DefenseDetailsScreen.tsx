@@ -11,7 +11,9 @@ import {
 import TopBar from '../common/TopBar';
 import BottomNav from '../common/BottomNav';
 
-const DefenseDetailsScreen: React.FC = () => {
+interface ScreenProps { onBack: () => void; onEvaluate: () => void }
+
+const DefenseDetailsScreen: React.FC<ScreenProps> = ({ onBack, onEvaluate }) => {
   const defenseData = {
     studentName: 'Rakoto Jean',
     studentMatricule: 'MAT-2024-001',
@@ -26,7 +28,7 @@ const DefenseDetailsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="Détails soutenance" showBackButton showNotification />
+      <TopBar title="Détails soutenance" showBackButton onBackPress={onBack} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Student Info Card */}
@@ -80,7 +82,7 @@ const DefenseDetailsScreen: React.FC = () => {
         </View>
 
         {/* Action Button */}
-        <TouchableOpacity style={styles.evaluateButton}>
+        <TouchableOpacity style={styles.evaluateButton} onPress={onEvaluate}>
           <Text style={styles.evaluateButtonText}>📝 Ouvrir le formulaire d'évaluation</Text>
         </TouchableOpacity>
       </ScrollView>

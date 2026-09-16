@@ -47,7 +47,9 @@ const Criterion: React.FC<CriterionProps> = ({ label, value, onChange }) => {
   );
 };
 
-const EvaluationFormScreen: React.FC = () => {
+interface ScreenProps { onBack: () => void }
+
+const EvaluationFormScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const [criteria, setCriteria] = useState({
     scientificQuality: 15,
     methodology: 14,
@@ -83,7 +85,7 @@ const EvaluationFormScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="Formulaire d'évaluation" showBackButton />
+      <TopBar title="Formulaire d'évaluation" showBackButton onBackPress={onBack} />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Average Display */}

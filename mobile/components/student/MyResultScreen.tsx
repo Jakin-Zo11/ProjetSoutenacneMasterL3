@@ -11,7 +11,9 @@ import {
 import TopBar from '../common/TopBar';
 import BottomNav from '../common/BottomNav';
 
-const MyResultScreen: React.FC = () => {
+interface ScreenProps { onBack: () => void }
+
+const MyResultScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const resultData = {
     isAvailable: true,
     finalGrade: 16.5,
@@ -28,7 +30,7 @@ const MyResultScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-        <TopBar title="Mon résultat" showBackButton showNotification />
+        <TopBar title="Mon résultat" showBackButton onBackPress={onBack} showNotification />
         
         <View style={styles.waitingContainer}>
           <Text style={styles.waitingIcon}>⏳</Text>
@@ -56,7 +58,7 @@ const MyResultScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="Mon résultat" showBackButton showNotification />
+      <TopBar title="Mon résultat" showBackButton onBackPress={onBack} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Final Grade Card */}

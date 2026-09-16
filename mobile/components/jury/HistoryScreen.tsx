@@ -46,7 +46,9 @@ const HistoryItem: React.FC<HistoryItemProps> = ({ studentName, date, role, grad
   );
 };
 
-const HistoryScreen: React.FC = () => {
+interface ScreenProps { onBack: () => void }
+
+const HistoryScreen: React.FC<ScreenProps> = ({ onBack }) => {
   const historyData = [
     {
       studentName: 'Rasolofomanana Luc',
@@ -88,7 +90,7 @@ const HistoryScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0D1F4E" />
-      <TopBar title="Historique" showBackButton showNotification />
+      <TopBar title="Historique" showBackButton onBackPress={onBack} showNotification />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.historyList}>

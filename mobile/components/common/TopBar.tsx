@@ -25,7 +25,7 @@ const TopBar: React.FC<TopBarProps> = ({
           </TouchableOpacity>
         ) : (
           <Image
-            source={require('../../assets/images/emit-logo.png')}
+            source={require('../../assets/images/Logo-emit.png')}
             style={styles.logo}
             resizeMode="contain"
           />
