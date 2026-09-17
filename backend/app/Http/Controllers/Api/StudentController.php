@@ -207,6 +207,8 @@ class StudentController extends Controller
 
     private function ensureStudent(Request $request): void
     {
-        abort_unless(in_array($request->user()->role, ['student', 'etudiant'], true), 403);
+        $user = $request->user();
+        abort_unless(in_array($user->role, ['student', 'etudiant'], true), 403);
+        abort_unless($user->student_status === 'approved', 403, 'Votre compte étudiant n’est pas encore validé.');
     }
 }

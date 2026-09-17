@@ -24,6 +24,11 @@ class UserFactory extends Factory
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
             'role' => 'student',
+            'matricule' => fake()->unique()->numerify('###I##'),
+            'mention' => 'informatique',
+            'parcours' => 'professionnel',
+            'admission_year' => 2022,
+            'student_status' => 'approved',
         ];
     }
 

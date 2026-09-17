@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AdminStudentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\StudentController;
 use App\Modules\Evaluation\Http\Controllers\DefenseEvaluationController;
@@ -18,12 +19,21 @@ use App\Modules\Evaluation\Http\Controllers\EvaluationGridController;
 |
 */
 
+Route::get('/register/options', [AuthController::class, 'registrationOptions']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register/student-lookup', [AuthController::class, 'findStudentByMatricule']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    Route::prefix('admin/students')->group(function () {
+        Route::get('/pending', [AdminStudentController::class, 'pending']);
+        Route::post('/registry', [AdminStudentController::class, 'addToRegistry']);
+        Route::post('/{user}/approve', [AdminStudentController::class, 'approve']);
+        Route::post('/{user}/reject', [AdminStudentController::class, 'reject']);
+    });
 
     Route::prefix('student')->group(function () {
         Route::get('/profile', [StudentController::class, 'profile']);

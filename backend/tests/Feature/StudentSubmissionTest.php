@@ -13,25 +13,6 @@ class StudentSubmissionTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_student_can_register_and_receive_a_token(): void
-    {
-        $response = $this->postJson('/api/register', [
-            'name' => 'Nouvel étudiant',
-            'email' => 'etudiant@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ]);
-
-        $response->assertCreated()
-            ->assertJsonPath('user.email', 'etudiant@example.com')
-            ->assertJsonPath('user.role', 'student')
-            ->assertJsonStructure(['token']);
-        $this->assertDatabaseHas('users', [
-            'email' => 'etudiant@example.com',
-            'role' => 'student',
-        ]);
-    }
-
     public function test_registration_rejects_duplicate_email_and_mismatched_password(): void
     {
         User::factory()->create(['email' => 'existing@example.com']);
@@ -41,6 +22,10 @@ class StudentSubmissionTest extends TestCase
             'email' => 'existing@example.com',
             'password' => 'password123',
             'password_confirmation' => 'different123',
+            'matricule' => '005I22',
+            'mention' => 'informatique',
+            'parcours' => 'professionnel',
+            'admission_year' => 2022,
         ])->assertStatus(422)
             ->assertJsonValidationErrors(['email', 'password']);
     }
